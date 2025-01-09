@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="fragments :: head"></th:block>
+    <link href="/css/user-creation.css" rel="stylesheet" />
+</head>
+
+<body>
+<header th:replace="fragments :: header-nav"></header>
+<div class="container">
+    <h2>Create New User</h2>
+    <form action="/manage-user" th:action="@{/manage-user}" th:object="${userDTO}" method="POST" id="user-form">
+
+        <!-- Email Input -->
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" th:field="*{email}" required placeholder="Enter email address">
+        </div>
+
+        <!-- Password Input -->
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" th:field="*{password}" required placeholder="Enter password">
+        </div>
+
+        <!-- User Role Dropdown -->
+        <div class="form-group">
+            <label for="role">User Role</label>
+            <select id="role" th:field="*{role}" required onchange="toggleAdditionalFields()">
+                <option value="admin">Admin</option>
+                <option value="doctor">Doctor</option>
+                <option value="patient">Patient</option>
+            </select>
+        </div>
+
+        <!-- Additional fields for Doctor -->
+        <div id="doctor-fields" class="hidden">
+            <div class="form-group">
+                <label for="doctor-name">Full Name</label>
+                <input type="text" id="doctor-name" th:field="*{doctorName}" required placeholder="Enter full name">
+            </div>
+            <div class="form-group">
+                <label for="doctor-code">Unique Doctor Code</label>
+                <input type="text" id="doctor-code" th:field="*{doctorCode}" required placeholder="Enter unique doctor code">
+            </div>
+            <div class="form-group">
+                <label for="specialties">Specialties (comma separated)</label>
+                <input type="text" id="specialties" th:field="*{specialties}" required placeholder="Enter specialties">
+            </div>
+        </div>
+
+        <!-- Additional fields for Patient -->
+        <div id="patient-fields" class="hidden">
+            <div class="form-group">
+                <label for="patient-name">Full Name</label>
+                <input type="text" id="patient-name" th:field="*{patientName}" required placeholder="Enter full name">
+            </div>
+            <div class="form-group">
+                <label for="ssn">Social Security Number (SSN)</label>
+                <input type="text" id="ssn" th:field="*{ssn}" required placeholder="Enter SSN">
+            </div>
+            <div class="form-group">
+                <label for="has-insurance">Has Paid Insurance</label>
+                <select id="has-insurance" th:field="*{hasPaidInsurance}" required>
+                    <option value="true" th:selected="${userDTO.hasPaidInsurance}">Yes</option>
+                    <option value="false" th:selected="${userDTO.hasPaidInsurance == false}">No</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="doctor-code">Unique Doctor Code</label>
+                <input type="text" id="patient-doctor-code" th:field="*{doctorCode}" required placeholder="Enter unique doctor code">
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit">Create User</button>
+    </form>
+</div>
+
+<!-- Display list of users before the footer -->
+<h2>Manage Users</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Username</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Iterate over usersList -->
+    <tr th:each="user : ${usersList}">
+        <td th:text="${user.username}"></td>
+        <td>
+            <!-- Form to delete the user -->
+            <form th:action="@{/delete-user/{id}(id=${user.id})}" method="post" style="display:inline;">
+                <button type="submit" class="delete-btn">Delete</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<footer th:replace="fragments :: footer"></footer>
+<script>
+    // This function ensures the role-specific fields are shown based on the selection
+    function toggleAdditionalFields() {
+        const role = document.getElementById('role').value;
+        const doctorFields = document.getElementById('doctor-fields');
+        const patientFields = document.getElementById('patient-fields');
+
+        // Hide all extra fields initially
+        doctorFields.style.display = 'none';
+        patientFields.style.display = 'none';
+
+        // Disable all hidden fields
+        document.querySelectorAll('.hidden input, .hidden select').forEach(field => field.disabled = true);
+
+        // Show and enable fields based on the selected role
+        if (role === 'doctor') {
+            doctorFields.style.display = 'block';
+            document.querySelectorAll('#doctor-fields input, #doctor-fields select').forEach(field => field.disabled = false);
+        } else if (role === 'patient') {
+            patientFields.style.display = 'block';
+            document.querySelectorAll('#patient-fields input, #patient-fields select').forEach(field => field.disabled = false);
+        }
+    }
+
+    // Initial call to show the fields based on the current role (in case of page reload)
+    window.onload = toggleAdditionalFields;
+</script>
+
+</body>
+</html>

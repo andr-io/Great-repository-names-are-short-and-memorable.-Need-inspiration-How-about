@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head th:replace="fragments :: head">
+</head>
+<body>
+<header th:replace="fragments :: header-nav"></header>
+<h1>Patients</h1>
+<div class="display-list">
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>SSN</th>
+            <th>Paid Insurance</th>
+            <th>Personal Doctor Code</th>
+            <th sec:authorize="hasRole('ROLE_ADMIN')">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Iterate over patientsList -->
+        <tr th:each="patient : ${patientsList}">
+            <td th:text="${patient.name}"></td> <!-- Display Name -->
+            <td th:text="${patient.EGN}"></td> <!-- Display SSN -->
+            <td th:text="${patient.hasPaidHisInsuranceInTheLastSixMonths ? 'Yes' : 'No'}"></td> <!-- Display Paid Insurance -->
+            <td th:text="${patient.uniqueDoctorCode}"></td> <!-- Display Doctor's Unique Code -->
+            <td sec:authorize="hasRole('ROLE_ADMIN')">
+                <!-- Edit Button -->
+                <button class="edit-btn" th:data-patient-id="${patient.id}" th:data-patient-name="${patient.name}"
+                        th:data-patient-ssn="${patient.EGN}" th:data-patient-insurance="${patient.hasPaidHisInsuranceInTheLastSixMonths}"
+                        th:data-patient-doctor="${patient.uniqueDoctorCode}"
+                        onclick="openEditModal(this)">Edit</button>
+
+                <!-- Delete Button -->
+                <form th:action="@{/delete-patient/{id}(id=${patient.id})}" method="post" style="display:inline;">
+                    <button class="delete-btn" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal for Edit Patient -->
+<div sec:authorize="hasRole('ROLE_ADMIN')" id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditModal()"></span>
+        <h3>Edit Patient</h3>
+        <form th:action="@{/edit-patient}" method="post" th:object="${editPatientDTO}">
+            <input type="hidden" th:field="*{id}" id="patient-id"/>
+
+            <div class="form-group">
+                <label for="patient-name">Full Name</label>
+                <input type="text" id="patient-name" th:field="*{name}" required placeholder="Enter full name"/>
+            </div>
+
+            <div class="form-group">
+                <label for="ssn">SSN</label>
+                <input type="text" id="ssn" th:field="*{EGN}" required placeholder="Enter SSN"/>
+            </div>
+
+            <div class="form-group">
+                <label for="hasPaidHisInsuranceInTheLastSixMonths">Paid Insurance</label>
+                <input type="checkbox" id="hasPaidHisInsuranceInTheLastSixMonths" th:field="*{hasPaidHisInsuranceInTheLastSixMonths}" />
+            </div>
+
+            <div class="form-group">
+                <label for="doctor-code">Unique Doctor Code</label>
+                <input type="text" id="doctor-code" th:field="*{uniqueDoctorCode}" required placeholder="Enter unique doctor code"/>
+            </div>
+
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<script sec:authorize="hasRole('ROLE_ADMIN')">
+    // Open Edit Modal
+    function openEditModal(button) {
+        const patientId = button.getAttribute('data-patient-id');
+        const patientName = button.getAttribute('data-patient-name');
+        const patientSSN = button.getAttribute('data-patient-ssn');
+        const patientInsurance = button.getAttribute('data-patient-insurance');
+        const patientDoctorCode = button.getAttribute('data-patient-doctor');
+
+        // Populate the modal fields
+        document.getElementById('patient-id').value = patientId;
+        document.getElementById('patient-name').value = patientName;
+        document.getElementById('ssn').value = patientSSN;
+        document.getElementById('hasPaidHisInsuranceInTheLastSixMonths').checked = patientInsurance === 'true'; // Check or uncheck the box
+        document.getElementById('doctor-code').value = patientDoctorCode;
+
+        // Show the modal
+        document.getElementById('editModal').style.display = "block";
+    }
+
+    // Close Edit Modal
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = "none";
+    }
+</script>
+
+<footer th:replace="fragments :: footer"></footer>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head th:replace="fragments :: head">
+</head>
+<body>
+
+<header th:replace="fragments :: header-nav"></header>
+
+<h1>Reports</h1>
+<h2 th:if="${mostFrequentDiagnosis != null}" th:text="${mostFrequentDiagnosis}"></h2>
+<h2 th:if="${monthWithMostSickLeave != null}" th:text="${monthWithMostSickLeave}"></h2>
+<h2 th:if="${doctorsMostSickLeave != null}" th:text="${doctorsMostSickLeave}"></h2>
+
+<div th:if="${reportDoctors != null}" class="display-list">
+    <table>
+        <thead>
+        <tr>
+            <th>Doctor Code</th>
+            <th>Patients count</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Iterate over doctorsList -->
+        <tr th:each="doctor : ${reportDoctors}">
+            <td th:text="${doctor.doctorCode}"></td>
+            <td th:text="${doctor.patientCount}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="report-buttons">
+
+    <!-- Button to get most frequent diagnosis -->
+    <form th:action="@{/reports/most-frequent-diagnosis}" method="get">
+        <button type="submit">Most Frequent Diagnosis</button>
+    </form>
+
+    <!-- Button to get count of patients per doctor -->
+    <form th:action="@{/reports/patient-count-per-doctor}" method="get">
+        <button type="submit">Count of Patients per Doctor</button>
+    </form>
+
+    <!-- Button to get information on doctors who created most SickLeaveDocuments -->
+    <form th:action="@{/reports/doctors-most-sick-leave}" method="get">
+        <button type="submit">Doctors with Most Sick Leave Documents</button>
+    </form>
+
+    <!-- Button to get the month with most SickLeaveDocuments created -->
+    <form th:action="@{/reports/month-with-most-sick-leave}" method="get">
+        <button type="submit">Month with Most Sick Leave Documents</button>
+    </form>
+
+    <!-- Button to get patients with specific diagnosis -->
+    <form th:action="@{/patients}" method="get">
+        <div class="form-group">
+            <label for="diagnosis">Diagnosis</label>
+            <input type="text" id="diagnosis" name="diagnosis" required placeholder="Enter diagnosis" />
+        </div>
+        <button type="submit">Get Patients by Diagnosis</button>
+    </form>
+
+    <!-- Button to get patients by doctor code -->
+    <form th:action="@{/patients}" method="get">
+        <div class="form-group">
+            <label for="doctor-code">Doctor Code</label>
+            <input type="text" id="doctor-code" name="doctorCode" required placeholder="Enter doctor code" />
+        </div>
+        <button type="submit">Get Patients by Doctor</button>
+    </form>
+
+    <!-- Button to see all visits for a patient by email -->
+    <form th:action="@{/exams}" method="get">
+        <div class="form-group">
+            <label for="patient-email">Patient Email</label>
+            <input type="email" id="patient-email" name="patientEmail" required placeholder="Enter patient email" />
+        </div>
+        <button type="submit">Get Patient Visits</button>
+    </form>
+
+    <!-- Button to get exams between two dates -->
+    <form th:action="@{/exams}" method="get">
+        <div class="form-group">
+            <label for="start-date">Start Date</label>
+            <input type="date" id="start-date" name="startDate" required />
+        </div>
+        <div class="form-group">
+            <label for="end-date">End Date</label>
+            <input type="date" id="end-date" name="endDate" required />
+        </div>
+        <button type="submit">Get Exams Between Dates</button>
+    </form>
+
+    <!-- Button to get doctor exams between two dates -->
+    <form th:action="@{/exams}" method="get">
+        <div class="form-group">
+            <label for="doctor-code-exams">Doctor Code</label>
+            <input type="text" id="doctor-code-exams" name="doctorCode" required placeholder="Enter doctor code" />
+        </div>
+        <div class="form-group">
+            <label for="start-date-exams">Start Date</label>
+            <input type="date" id="start-date-exams" name="startDate" required />
+        </div>
+        <div class="form-group">
+            <label for="end-date-exams">End Date</label>
+            <input type="date" id="end-date-exams" name="endDate" required />
+        </div>
+        <button type="submit">Get Doctor's Exams Between Dates</button>
+    </form>
+
+</div>
+
+<footer th:replace="fragments :: footer"></footer>
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head th:replace="fragments :: head">
+</head>
+<body>
+<header th:replace="fragments :: header-nav"></header>
+<h1>Exams</h1>
+
+<!-- Button to create a new exam -->
+<div sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_DOCTOR')">
+    <button class="create-btn" onclick="openCreateExamModal()">Create New Exam</button>
+</div>
+
+<div class="display-list">
+    <table>
+        <thead>
+        <tr>
+            <th>Doctor Unique Code</th>
+            <th>Patient SSN</th>
+            <th>Conducted Date</th>
+            <th>Diagnosys</th>
+            <th>Sick Leave Document</th>
+            <th>Sick Leave Duration (days)</th>
+            <th sec:authorize="hasRole('ROLE_DOCTOR') or hasRole('ROLE_ADMIN')">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Iterate over examsList -->
+        <tr th:each="exam : ${examsList}">
+            <td th:text="${exam.uniqueDoctorCode}"></td> <!-- Display Doctor's Unique Code -->
+            <td th:text="${exam.patientSSN}"></td> <!-- Display Patient Name -->
+            <td th:text="${exam.conductedDate}"></td> <!-- Display Conducted Date -->
+            <td>
+                <ul>
+                    <li th:each="diagnosis : ${exam.diagnosys}" th:text="${diagnosis}"></li>
+                </ul>
+            </td>
+            <td th:text="${exam.sickLeaveStartDate}"></td> <!-- Display Sick Leave Document -->
+            <td th:text="${exam.sickLeaveDuration}"></td> <!-- Display Sick Leave Duration -->
+            <td>
+                <!-- Edit Button -->
+                <button sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_DOCTOR')" th:if="${exam.uniqueDoctorCode == doctorCode || doctorCode == null}" class="edit-btn" th:data-exam-id="${exam.id}" th:data-doctor="${exam.uniqueDoctorCode}"
+                        th:data-patient="${exam.patientSSN}" th:data-date="${exam.conductedDate}"
+                        th:data-sick-leave="${exam.sickLeaveStartDate}"
+                        th:data-sick-leave-duration="${exam.sickLeaveDuration}"
+                        th:data-diagnosys="${exam.diagnosys}"
+                        onclick="openEditModal(this)">Edit</button>
+
+                <!-- Delete Button -->
+                <form sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_DOCTOR')" th:if="${exam.uniqueDoctorCode == doctorCode || doctorCode == null}" th:action="@{/delete-exam/{id}(id=${exam.id})}" method="post" style="display:inline;">
+                    <button class="delete-btn" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal for Create New Exam (Visible only for doctors) -->
+<div sec:authorize="hasRole('ROLE_DOCTOR') or hasRole('ROLE_ADMIN')" id="createExamModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeCreateExamModal()"></span>
+        <h3>Create New Exam</h3>
+        <form th:action="@{/create-exam}" method="post" th:object="${newExamDTO}">
+            <div sec:authorize="hasRole('ROLE_ADMIN')" class="form-group">
+                <label for="doctor">Doctor Unique Code</label>
+                <input type="text" id="doctor" th:field="*{uniqueDoctorCode}" required placeholder="Enter doctor's unique code"/>
+            </div>
+
+            <div class="form-group">
+                <label for="patient">Patient</label>
+                <input type="text" id="patient" th:field="*{EGN}" required placeholder="Enter patient's SSN"/>
+            </div>
+
+            <div class="form-group">
+                <label for="conductedDate">Conducted Date</label>
+                <input type="date" id="conductedDate" th:field="*{conductedDate}" required placeholder="Enter conducted date"/>
+            </div>
+
+            <div class="form-group">
+                <label for="diagnosys">Diagnosys (comma separated)</label>
+                <input type="text" id="diagnosys" th:field="*{diagnosys}" required placeholder="Enter diagnosis"/>
+            </div>
+
+            <div class="form-group">
+                <label for="sickLeaveDocumentStartDate">Sick Leave Start Date</label>
+                <input type="date" id="sickLeaveDocumentStartDate" th:field="*{sickLeaveStartDate}" placeholder="Enter sick leave start date"/>
+            </div>
+
+            <div class="form-group">
+                <label for="sickLeaveDuration">Sick Leave Duration (days)</label>
+                <input type="number" id="sickLeaveDuration" th:field="*{sickLeaveDuration}" required placeholder="Enter sick leave duration in days"/>
+            </div>
+
+            <button type="submit">Create Exam</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal for Edit Exam (Visible only for admin) -->
+<div sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_DOCTOR')" id="editExamModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditExamModal()"></span>
+        <h3>Edit Exam</h3>
+        <form th:action="@{/edit-exam}" method="post" th:object="${editExamDTO}">
+            <input type="hidden" th:field="*{id}" id="exam-id"/>
+
+            <div class="form-group">
+                <label for="doctor">Doctor Unique Code</label>
+                <input type="text" id="exam-doctor" th:field="*{uniqueDoctorCode}" required placeholder="Enter doctor's unique code" />
+            </div>
+
+            <div class="form-group">
+                <label for="patient">Patient</label>
+                <input type="text" id="exam-patient" th:field="*{EGN}" required placeholder="Enter patient's SSN"/>
+            </div>
+
+            <div class="form-group">
+                <label for="conductedDate">Conducted Date</label>
+                <input type="date" id="conducted-date" th:field="*{conductedDate}" required placeholder="Enter conducted date"/>
+            </div>
+
+            <div class="form-group">
+                <label for="diagnosys">Diagnosys</label>
+                <input type="text" id="exam-diagnosys" th:field="*{diagnosys}" required placeholder="Enter diagnosis (comma separated)"/>
+            </div>
+
+            <div class="form-group">
+                <label for="exam-sick-leave">Sick Leave Start Date</label>
+                <input type="date" id="exam-sick-leave" th:field="*{sickLeaveStartDate}" required placeholder="Enter sick leave date"/>
+            </div>
+
+            <div class="form-group">
+                <label for="exam-sick-leave-duration">Sick Leave Duration (days)</label>
+                <input type="number" id="exam-sick-leave-duration" th:field="*{sickLeaveDuration}" required placeholder="Enter sick leave duration in days"/>
+            </div>
+
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<script sec:authorize="hasRole('ROLE_DOCTOR') or hasRole('ROLE_ADMIN')">
+    // Open Create Exam Modal
+    function openCreateExamModal() {
+        // Pre-fill doctor info (optional)
+        document.getElementById('createExamModal').style.display = "block";
+    }
+
+    // Close Create Exam Modal
+    function closeCreateExamModal() {
+        document.getElementById('createExamModal').style.display = "none";
+    }
+</script>
+
+<script sec:authorize="hasRole('ROLE_DOCTOR') or hasRole('ROLE_ADMIN')">
+    // Open Edit Modal
+    function openEditModal(button) {
+        const examId = button.getAttribute('data-exam-id');
+        const doctorCode = button.getAttribute('data-doctor');
+        const patientName = button.getAttribute('data-patient');
+        const conductedDate = button.getAttribute('data-date');
+        const sickLeaveDate = button.getAttribute('data-sick-leave');
+        const sickLeaveDuration = button.getAttribute('data-sick-leave-duration');
+        const diagnosys = button.getAttribute('data-diagnosys');
+
+        // Populate the modal fields
+        document.getElementById('exam-id').value = examId;
+        document.getElementById('exam-doctor').value = doctorCode;
+        document.getElementById('exam-patient').value = patientName;
+        document.getElementById('conducted-date').value = conductedDate;
+        document.getElementById('exam-sick-leave').value = sickLeaveDate;
+        document.getElementById('exam-sick-leave-duration').value = sickLeaveDuration;
+        document.getElementById('exam-diagnosys').value = diagnosys;
+
+        // Show the modal
+        document.getElementById('editExamModal').style.display = "block";
+    }
+
+    // Close Edit Modal
+    function closeEditExamModal() {
+        document.getElementById('editExamModal').style.display = "none";
+    }
+</script>
+
+<footer th:replace="fragments :: footer"></footer>
+</body>
+</html>

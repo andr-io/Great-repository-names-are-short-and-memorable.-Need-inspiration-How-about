@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head th:replace="fragments :: head">
+</head>
+<body>
+<header th:replace="fragments :: header-nav"></header>
+<h1>Medical Files</h1>
+<h2 sec:authorize="hasRole('ROLE_ANONYMOUS')">Welcome! Please log in to use our website!</h2>
+<h2 sec:authorize="hasRole('ROLE_DOCTOR')">Welcome, Doctor!</h2>
+<h2 sec:authorize="hasRole('ROLE_ADMIN')">Welcome, Admin!</h2>
+<h2 sec:authorize="hasRole('ROLE_PATIENT')">Welcome, Patient!</h2>
+<footer th:replace="fragments :: footer"></footer>
+</body>
+</html>

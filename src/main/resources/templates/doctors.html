@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head th:replace="fragments :: head">
+</head>
+<body>
+<header th:replace="fragments :: header-nav"></header>
+<h1>Doctors</h1>
+<div class="display-list">
+    <table>
+        <thead>
+        <tr>
+            <th>Username (Email)</th>
+            <th>Name</th>
+            <th>Doctor Code</th>
+            <th>Specialities</th>
+            <th sec:authorize="hasRole('ROLE_ADMIN')">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Iterate over doctorsList -->
+        <tr th:each="doctor : ${doctorsList}">
+            <td th:text="${doctor.username}"></td> <!-- Display Username (Email) -->
+            <td th:text="${doctor.name}"></td> <!-- Display Name -->
+            <td th:text="${doctor.uniqueDoctorCode}"></td> <!-- Display Unique Doctor Code -->
+            <td>
+                <ul>
+                    <li th:each="speciality : ${doctor.speciality}" th:text="${speciality.name}"></li>
+                </ul>
+            </td>
+            <td sec:authorize="hasRole('ROLE_ADMIN')">
+                <!-- Edit Button -->
+                <button class="edit-btn" th:data-doctor-id="${doctor.id}" th:data-doctor-name="${doctor.name}"
+                        th:data-doctor-code="${doctor.uniqueDoctorCode}" th:data-speciality="${doctor.specialityConcatenated}"
+                        onclick="openEditModal(this)">Edit</button>
+
+                <!-- Delete Button -->
+                <form th:action="@{/delete-doctor/{id}(id=${doctor.id})}" method="post" style="display:inline;">
+                    <button class="delete-btn" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal for Edit Doctor -->
+<div sec:authorize="hasRole('ROLE_ADMIN')" id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditModal()"></span>
+        <h3>Edit Doctor</h3>
+        <form th:action="@{/edit-doctor}" method="post" th:object="${editDoctorDTO}">
+            <input type="hidden" th:field="*{id}" id="doctor-id"/>
+
+            <div class="form-group">
+                <label for="doctor-name">Full Name</label>
+                <input type="text" id="doctor-name" th:field="*{name}" required placeholder="Enter full name"/>
+            </div>
+
+            <div class="form-group">
+                <label for="doctor-code">Unique Doctor Code</label>
+                <input type="text" id="doctor-code" th:field="*{uniqueDoctorCode}" required placeholder="Enter unique doctor code"/>
+            </div>
+
+            <div class="form-group">
+                <label for="specialties">Specialties (comma separated)</label>
+                <input type="text" id="specialties" th:field="*{specialties}" required placeholder="Enter specialties"/>
+            </div>
+
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<script sec:authorize="hasRole('ROLE_ADMIN')">
+    // Open Edit Modal
+    function openEditModal(button) {
+        const doctorId = button.getAttribute('data-doctor-id');
+        const doctorName = button.getAttribute('data-doctor-name');
+        const doctorCode = button.getAttribute('data-doctor-code');
+        const doctorSpecialities = button.getAttribute('data-speciality');
+
+        // Populate the modal fields
+        document.getElementById('doctor-id').value = doctorId;
+        document.getElementById('doctor-name').value = doctorName;
+        document.getElementById('doctor-code').value = doctorCode;
+        document.getElementById('specialties').value = doctorSpecialities;
+
+        // Show the modal
+        document.getElementById('editModal').style.display = "block";
+    }
+
+    // Close Edit Modal
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = "none";
+    }
+</script>
+<footer th:replace="fragments :: footer"></footer>
+</body>
+</html>
