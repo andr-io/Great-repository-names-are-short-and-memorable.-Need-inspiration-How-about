@@ -18,20 +18,20 @@
         </tr>
         </thead>
         <tbody>
-        <!-- Iterate over patientsList -->
+
         <tr th:each="patient : ${patientsList}">
-            <td th:text="${patient.name}"></td> <!-- Display Name -->
-            <td th:text="${patient.EGN}"></td> <!-- Display SSN -->
-            <td th:text="${patient.hasPaidHisInsuranceInTheLastSixMonths ? 'Yes' : 'No'}"></td> <!-- Display Paid Insurance -->
-            <td th:text="${patient.uniqueDoctorCode}"></td> <!-- Display Doctor's Unique Code -->
+            <td th:text="${patient.name}"></td>
+            <td th:text="${patient.EGN}"></td>
+            <td th:text="${patient.hasPaidHisInsuranceInTheLastSixMonths ? 'Yes' : 'No'}"></td>
+            <td th:text="${patient.uniqueDoctorCode}"></td>
             <td sec:authorize="hasRole('ROLE_ADMIN')">
-                <!-- Edit Button -->
+
                 <button class="edit-btn" th:data-patient-id="${patient.id}" th:data-patient-name="${patient.name}"
                         th:data-patient-ssn="${patient.EGN}" th:data-patient-insurance="${patient.hasPaidHisInsuranceInTheLastSixMonths}"
                         th:data-patient-doctor="${patient.uniqueDoctorCode}"
                         onclick="openEditModal(this)">Edit</button>
 
-                <!-- Delete Button -->
+
                 <form th:action="@{/delete-patient/{id}(id=${patient.id})}" method="post" style="display:inline;">
                     <button class="delete-btn" type="submit">Delete</button>
                 </form>
@@ -41,7 +41,7 @@
     </table>
 </div>
 
-<!-- Modal for Edit Patient -->
+
 <div sec:authorize="hasRole('ROLE_ADMIN')" id="editModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeEditModal()"></span>

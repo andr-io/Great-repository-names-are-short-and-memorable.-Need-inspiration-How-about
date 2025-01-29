@@ -24,6 +24,6 @@ public class Doctor extends User {
     @NotNull
     private String uniqueDoctorCode;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Set<Speciality> speciality;
 }

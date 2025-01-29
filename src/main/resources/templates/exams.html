@@ -7,7 +7,6 @@
 <header th:replace="fragments :: header-nav"></header>
 <h1>Exams</h1>
 
-<!-- Button to create a new exam -->
 <div sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_DOCTOR')">
     <button class="create-btn" onclick="openCreateExamModal()">Create New Exam</button>
 </div>
@@ -26,18 +25,17 @@
         </tr>
         </thead>
         <tbody>
-        <!-- Iterate over examsList -->
         <tr th:each="exam : ${examsList}">
-            <td th:text="${exam.uniqueDoctorCode}"></td> <!-- Display Doctor's Unique Code -->
-            <td th:text="${exam.patientSSN}"></td> <!-- Display Patient Name -->
-            <td th:text="${exam.conductedDate}"></td> <!-- Display Conducted Date -->
+            <td th:text="${exam.uniqueDoctorCode}"></td>
+            <td th:text="${exam.patientSSN}"></td>
+            <td th:text="${exam.conductedDate}"></td>
             <td>
                 <ul>
                     <li th:each="diagnosis : ${exam.diagnosys}" th:text="${diagnosis}"></li>
                 </ul>
             </td>
-            <td th:text="${exam.sickLeaveStartDate}"></td> <!-- Display Sick Leave Document -->
-            <td th:text="${exam.sickLeaveDuration}"></td> <!-- Display Sick Leave Duration -->
+            <td th:text="${exam.sickLeaveStartDate}"></td>
+            <td th:text="${exam.sickLeaveDuration}"></td>
             <td>
                 <!-- Edit Button -->
                 <button sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_DOCTOR')" th:if="${exam.uniqueDoctorCode == doctorCode || doctorCode == null}" class="edit-btn" th:data-exam-id="${exam.id}" th:data-doctor="${exam.uniqueDoctorCode}"
@@ -57,7 +55,6 @@
     </table>
 </div>
 
-<!-- Modal for Create New Exam (Visible only for doctors) -->
 <div sec:authorize="hasRole('ROLE_DOCTOR') or hasRole('ROLE_ADMIN')" id="createExamModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeCreateExamModal()"></span>
@@ -98,7 +95,6 @@
     </div>
 </div>
 
-<!-- Modal for Edit Exam (Visible only for admin) -->
 <div sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_DOCTOR')" id="editExamModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeEditExamModal()"></span>
@@ -142,20 +138,16 @@
 </div>
 
 <script sec:authorize="hasRole('ROLE_DOCTOR') or hasRole('ROLE_ADMIN')">
-    // Open Create Exam Modal
     function openCreateExamModal() {
-        // Pre-fill doctor info (optional)
         document.getElementById('createExamModal').style.display = "block";
     }
 
-    // Close Create Exam Modal
     function closeCreateExamModal() {
         document.getElementById('createExamModal').style.display = "none";
     }
 </script>
 
 <script sec:authorize="hasRole('ROLE_DOCTOR') or hasRole('ROLE_ADMIN')">
-    // Open Edit Modal
     function openEditModal(button) {
         const examId = button.getAttribute('data-exam-id');
         const doctorCode = button.getAttribute('data-doctor');
@@ -165,7 +157,6 @@
         const sickLeaveDuration = button.getAttribute('data-sick-leave-duration');
         const diagnosys = button.getAttribute('data-diagnosys');
 
-        // Populate the modal fields
         document.getElementById('exam-id').value = examId;
         document.getElementById('exam-doctor').value = doctorCode;
         document.getElementById('exam-patient').value = patientName;
@@ -174,11 +165,9 @@
         document.getElementById('exam-sick-leave-duration').value = sickLeaveDuration;
         document.getElementById('exam-diagnosys').value = diagnosys;
 
-        // Show the modal
         document.getElementById('editExamModal').style.display = "block";
     }
 
-    // Close Edit Modal
     function closeEditExamModal() {
         document.getElementById('editExamModal').style.display = "none";
     }

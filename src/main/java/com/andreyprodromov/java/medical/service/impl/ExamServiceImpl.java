@@ -70,18 +70,7 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public void deleteExam(long id) {
         Exam exam = examRepository.findById(id).get();
-        Set<Diagnosys> diagnosys = exam.getDiagnosys();
-
-        for (var d : diagnosys) {
-            var set = d.getExam();
-            set.removeIf(d1 -> d1.getId() == d.getId());
-            d.setExam(set);
-            diagnosysRepository.save(d);
-        }
-
-        exam.setDiagnosys(new HashSet<>());
-        exam = examRepository.save(exam);
-        examRepository.deleteById(id);
+        examRepository.delete(exam);
     }
 
     @Override

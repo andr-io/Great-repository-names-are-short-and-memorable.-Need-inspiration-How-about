@@ -18,11 +18,11 @@
         </tr>
         </thead>
         <tbody>
-        <!-- Iterate over doctorsList -->
+
         <tr th:each="doctor : ${doctorsList}">
-            <td th:text="${doctor.username}"></td> <!-- Display Username (Email) -->
-            <td th:text="${doctor.name}"></td> <!-- Display Name -->
-            <td th:text="${doctor.uniqueDoctorCode}"></td> <!-- Display Unique Doctor Code -->
+            <td th:text="${doctor.username}"></td>
+            <td th:text="${doctor.name}"></td>
+            <td th:text="${doctor.uniqueDoctorCode}"></td>
             <td>
                 <ul>
                     <li th:each="speciality : ${doctor.speciality}" th:text="${speciality.name}"></li>
@@ -73,24 +73,20 @@
 </div>
 
 <script sec:authorize="hasRole('ROLE_ADMIN')">
-    // Open Edit Modal
     function openEditModal(button) {
         const doctorId = button.getAttribute('data-doctor-id');
         const doctorName = button.getAttribute('data-doctor-name');
         const doctorCode = button.getAttribute('data-doctor-code');
         const doctorSpecialities = button.getAttribute('data-speciality');
 
-        // Populate the modal fields
         document.getElementById('doctor-id').value = doctorId;
         document.getElementById('doctor-name').value = doctorName;
         document.getElementById('doctor-code').value = doctorCode;
         document.getElementById('specialties').value = doctorSpecialities;
 
-        // Show the modal
         document.getElementById('editModal').style.display = "block";
     }
 
-    // Close Edit Modal
     function closeEditModal() {
         document.getElementById('editModal').style.display = "none";
     }

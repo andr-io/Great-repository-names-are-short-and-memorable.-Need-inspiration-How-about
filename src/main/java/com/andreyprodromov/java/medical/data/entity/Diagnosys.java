@@ -14,7 +14,7 @@ public class Diagnosys extends BaseEntity {
     @NotNull
     private String name;
 
-    @ManyToMany(
+    @ManyToMany(mappedBy = "diagnosys",
         cascade = {
             CascadeType.PERSIST,
             CascadeType.MERGE

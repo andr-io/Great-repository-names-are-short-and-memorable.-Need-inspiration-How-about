@@ -46,7 +46,7 @@ public class Exam extends BaseEntity {
     )
     Set<Diagnosys> diagnosys;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @NotNull
     SickLeaveDocument sickLeaveDocument;
 }
